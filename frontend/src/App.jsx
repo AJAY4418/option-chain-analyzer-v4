@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Activity, RefreshCw, ShieldCheck, Wifi, WifiOff, Download, TrendingUp, BarChart3, CircleAlert } from "lucide-react";
 
 const SYMBOLS = ["NIFTY", "BANKNIFTY", "FINNIFTY"];
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 const money = (v) => Number.isFinite(Number(v)) ? Number(v).toLocaleString("en-IN", { maximumFractionDigits: 2 }) : "—";
 
 export default function App() {
@@ -20,7 +21,7 @@ export default function App() {
     try {
       const q = new URLSearchParams({ symbol });
       if (expiry) q.set("expiry", expiry);
-      const response = await fetch("/api/option-chain?" + q.toString());
+      const response = await fetch(`${API_BASE}/api/option-chain?${q.toString()}`);
       const body = await response.json();
       if (!response.ok) throw new Error(body.detail || "डेटा प्राप्त नहीं हुआ");
       setPayload(body);
@@ -39,7 +40,7 @@ export default function App() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/health")
+    fetch(`${API_BASE}/api/health`)
       .then((r) => r.json())
       .then(() => { if (active) setStatus("ready"); })
       .catch(() => { if (active) setStatus("offline"); });
